@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize as spo
 
-# A = Mo B = Os
 class p:
     R = 1.986
     def __init__(self, mul1A, num1A, mul2A, num2A, mul1B, num1B, mul2B, num2B):
@@ -59,6 +58,9 @@ class p:
         plt.xlim(0, 1)
         plt.show()
         print(XBl1[mask1])
-
+# Organize assim: 
+# A = Mo 2.0(2900 − T) 2.0(1900 − T)  >>> 2 2900 2 1900
+# B = Os 2.8(1960 − T) 2.0(3300 − T)  >>> 2.8 1960 2 3300
+# dGA (b->L) , dGA (E->L), dGB (b->L) , dGB (E->L)
 L = p(2, 2900, 2, 1900, 2.8, 1960, 2, 3300)		
 L.plot()
