@@ -57,7 +57,7 @@ class p:
         plt.hlines(t0, XBe1[mask1][0], XBb1[mask1][0], 'black')
         plt.xlim(0, 1)
         plt.show()
-        print(XBl1[mask1])
+        
 # Organize assim: 
 # A = Mo 2.0(2900 − T) 2.0(1900 − T)  >>> 2 2900 2 1900
 # B = Os 2.8(1960 − T) 2.0(3300 − T)  >>> 2.8 1960 2 3300
