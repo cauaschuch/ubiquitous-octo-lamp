@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import numpy as np
-
+from matplotlib import rc
+rc('text', usetex=True)
 V_mag = """
       310.3       136.9       136.9         0.0         0.0         0.0 
       136.9       310.3       136.9         0.0         0.0         0.0 
@@ -80,3 +82,56 @@ C_Y_T3_ta = np.sqrt(V44 / p_Ta)
 print(C_A_L_v,C_A_T_v,C_B_L_v,C_B_T_v,C_Y_L_v,C_Y_Th_v,C_Y_T3_v)
 print(C_A_L_nb,C_A_T_nb,C_B_L_nb,C_B_T_nb,C_Y_L_nb,C_Y_Th_nb,C_Y_T3_nb)
 print(C_A_L_ta,C_A_T_ta,C_B_L_ta,C_B_T_ta,C_Y_L_ta,C_Y_Th_ta,C_Y_T3_ta)
+
+
+def v_longitudinal(p_V,bulk,poisson,G):
+  lbd = 3*bulk*poisson/(1+poisson)
+  mi = 1.5*(1-2*poisson)*bulk/(1+poisson)
+  return np.sqrt((lbd+2*mi)/p_V), np.sqrt((3*bulk+4*G)/(3*p_V))
+def v_transversal(p_V,bulk,poisson,G):
+  mi = 1.5*(1-2*poisson)*bulk/(1+poisson)
+  return np.sqrt(mi/p_V),np.sqrt(G/p_V)
+v_l_nb,a2 = v_longitudinal(p_Nb,214.4e9,.29,106.62e9)
+v_t_nb,b2 = v_transversal(p_Nb,214.4e9,.29,106.62e9)
+
+
+def v_m(p_V,bulk,poisson):
+  lbd = 3*bulk*poisson/(1+poisson)
+  mi = 1.5*(1-2*poisson)*bulk/(1+poisson)
+  v_l,v_t = np.sqrt((lbd+2*mi)/p_V),np.sqrt(mi/p_V)
+  v_m = (3*(1/v_l**3 + 2/v_t**3)**-1)**(1/3)
+  return v_m#,v_l,v_t,
+
+def debye_T(v_m,v_at):
+  h,k = 1.054e-34,1.381e-23
+  return h*v_m*((6*np.pi**2/v_at)**(1/3))/k
+#print(v_m(p_V,194.68e9,.3))
+#print(v_m(p_Nb,214.4e9,.29))
+#print(v_m(p_Ta,223.27e9,.28))
+#print(debye_T(v_m(p_V,194.68e9,.3),(a_V**3)/29))
+#print(debye_T(v_m(p_Nb,214.4e9,.29),(a_Nb**3)/29))
+print(debye_T(v_m(p_Ta,223.27e9,.28),(a_Ta**3)/29))
+
+from scipy.integrate import quad
+R = 8.31451
+def Cv(Td, N, T):
+  f = lambda x: np.exp(x)*x**4/((np.exp(x)-1)**2)
+  result, error = quad(f, 0, Td/T)
+  return result*9*N*R*(T/Td)**3
+
+
+T = np.linspace(1e-5,400,500)
+
+cv_valsV = np.array([Cv(329.34,1,t) for t in T])
+cv_valsNb = np.array([Cv(330.31,1,t) for t in T])
+cv_valsTa = np.array([Cv(301.89,1,t) for t in T])
+plt.plot(T,cv_valsTa/R, label='Ta')
+plt.plot(T,cv_valsNb/R, label='Nb')
+plt.plot(T,cv_valsV/R, label='V')
+
+plt.legend()
+plt.xlabel('T [K]')
+plt.ylabel('Cv [J/(mol*K)]')
+plt.xlim(0,400)
+plt.ylim(0,3)
+plt.show()
